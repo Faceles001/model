@@ -1,8 +1,3 @@
-"""
-Модель электрической сети посёлка.
-Streamlit-приложение для расчёта потерь, токов и проверки по ПУЭ.
-"""
-
 import math
 import streamlit as st
 import matplotlib.pyplot as plt
@@ -233,4 +228,5 @@ st.subheader("Итоговые цифры")
 st.write(f"**Суммарная нагрузка:** {total_kw:.1f} кВт")
 st.write(f"**Ток в голове линии:** {get_current(total_kw):.1f} А")
 st.write(f"**Потери напряжения:** {total_drop:.2f} В ({drop_percent:.2f}%)")
+
 st.write(f"**Напряжение у дальнего дома:** {voltages[-1] if voltages else voltage:.1f} В")
