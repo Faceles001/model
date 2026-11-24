@@ -11,7 +11,7 @@ st.sidebar.header("Настройки")
 k_dom = st.sidebar.slider("Кол-во домов", 1, 10, 5)
 p_dom = st.sidebar.slider("Мощность 1 дома (кВт)", 1, 15, 6, 1)
 k_fon = st.sidebar.slider("Кол-во фонарей", 0, 20, 8)
-p_fon = st.sidebar.slider("Мощность фонаря (кВт)", 0.1, 1.0, 0.25, 0.05)
+p_fon = st.sidebar.slider("Мощность фонаря (кВт)", 0.1, 1, 0.25, 0.05)
 
 dl = st.sidebar.slider("Длина (м)", 50, 500, 150, 10)
 s = st.sidebar.selectbox("Сечение (мм2)", [2.5, 4, 6, 10, 16, 25], index=3)
@@ -79,30 +79,30 @@ with c1:
     if sum_p > tp_p:
         st.error(f"ТП перегружена: {round(sum_p)} > {tp_p} кВт")
     elif sum_p > tp_p * 0.9:
-        st.warning(f"ТП почти на пределе: {round(sum_p)} / {tp_p} кВт")
+        st.warning(f"ТП близко к пределу: {round(sum_p)} / {tp_p} кВт")
     else:
-        st.success(f"ТП справляется: {round(sum_p)} / {tp_p} кВт")
+        st.success(f"ТП: {round(sum_p)} / {tp_p} кВт")
 
 with c2:
     if drop_percent > 5:
-        st.error(f"Потери {round(drop_percent, 2)}% — выше нормы (5%)")
+        st.error(f"Потери {round(drop_percent, 2)}% > 5%")
     elif drop_percent > 3:
-        st.warning(f"Потери {round(drop_percent, 2)}% — многовато")
+        st.warning(f"Потери {round(drop_percent, 2)}% — норма, но высокие")
     else:
-        st.success(f"Потери {round(drop_percent, 2)}% — нормально")
+        st.success(f"Потери {round(drop_percent, 2)}% < 5%")
 
 with c3:
     i_dom = count_tok(p_dom)
     if i_dom > pr * 1.1:
-        st.error(f"Ток дома {round(i_dom, 1)} А — выбьет предохранитель {pr} А")
+        st.error(f"Ток дома {round(i_dom, 1)} А > {pr} А")
     else:
-        st.success(f"Ток дома {round(i_dom, 1)} А — предохранитель {pr} А подходит")
+        st.success(f"Ток дома {round(i_dom, 1)} А < {pr} А")
 
 with c4:
     if res >= p_dom:
-        st.success("Резерва хватает")
+        st.success(f"Резерв {res} кВт")
     elif res > 0:
-        st.warning("Резерв маловат")
+        st.warning(f"Резерв {res} кВт < {p_dom} кВт")
     else:
         st.error("Резерва нет")
 
