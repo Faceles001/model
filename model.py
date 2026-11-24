@@ -11,7 +11,7 @@ st.sidebar.header("Настройки")
 k_dom = st.sidebar.slider("Кол-во домов", 1, 10, 5)
 p_dom = st.sidebar.slider("Мощность 1 дома (кВт)", 1, 15, 6, 1)
 k_fon = st.sidebar.slider("Кол-во фонарей", 0, 20, 8)
-p_fon = st.sidebar.slider("Мощность фонаря (кВт)", 0.1, 1, 0.25, 0.05)
+p_fon = st.sidebar.slider("Мощность фонаря (кВт)", 0.1, 1.0, 0.25, 0.05)
 
 dl = st.sidebar.slider("Длина (м)", 50, 500, 150, 10)
 s = st.sidebar.selectbox("Сечение (мм2)", [2.5, 4, 6, 10, 16, 25], index=3)
