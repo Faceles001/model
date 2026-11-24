@@ -217,12 +217,10 @@ with t4:
     for i in range(len(x_coord)):
         x_pos = x_coord[i]
         if brk == 0 or (i + 1) < brk:
-            alive = True
             col = "#a52a2a"
             status_text = "свет"
             status_color = "green"
         else:
-            alive = False
             col = "#cccccc"
             status_text = "нет"
             status_color = "red"
