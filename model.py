@@ -76,11 +76,11 @@ with c1:
 
 with c2:
     if drop_percent > 5:
-        st.error(f"Потери {round(drop_percent, 2)}% — больше 5%")
+        st.error(f"Потери {round(drop_percent, 2)}% — превышают норму (5%)")
     elif drop_percent > 3:
-        st.warning(f"Потери {round(drop_percent, 2)}% — многовато")
+        st.warning(f"Потери {round(drop_percent, 2)}% — близко к пределу")
     else:
-        st.success(f"Потери {round(drop_percent, 2)}% — всё ок")
+        st.success(f"Потери {round(drop_percent, 2)}% — в пределах нормы")
 
 with c3:
     i_dom = count_tok(p_dom)
