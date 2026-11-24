@@ -12,7 +12,6 @@ k_dom = st.sidebar.slider("Кол-во домов", 1, 10, 5)
 p_dom = st.sidebar.slider("Мощность 1 дома (кВт)", 1, 15, 6, 1)
 k_fon = st.sidebar.slider("Кол-во фонарей", 0, 20, 8)
 
-# ТУТ ИСПРАВЛЕНО: все числа float, шаг 0.05
 p_fon = st.sidebar.slider("Мощность фонаря (кВт)", 0.1, 1.0, 0.25, 0.05)
 
 dl = st.sidebar.slider("Длина (м)", 50, 500, 150, 10)
@@ -22,7 +21,6 @@ tp_p = st.sidebar.slider("Мощность ТП (кВт)", 20, 200, 60, 10)
 res = st.sidebar.slider("Резерв (кВт)", 0, 30, 7, 1)
 brk = st.sidebar.slider("Номер участка с обрывом", 0, k_dom, 2)
 
-# физика
 U = 400
 cosf = 0.95
 r_m = 0.0175
@@ -73,7 +71,6 @@ drop_percent = tot_drop / U * 100
 
 print("Нагрузка:", sum_p, "кВт. Потери:", round(drop_percent, 2), "%")
 
-# проверки
 st.subheader("Проверка")
 c1, c2, c3, c4 = st.columns(4)
 
@@ -108,7 +105,6 @@ with c4:
     else:
         st.error("Резерва нет")
 
-# графики
 st.subheader("Графики")
 t1, t2, t3, t4 = st.tabs(["Схема", "Напряжение", "Потери и токи", "Обрыв"])
 
@@ -198,7 +194,6 @@ with t4:
     ax.add_patch(patches.Rectangle((-30, -12), 24, 24, facecolor="#8a9a5b", edgecolor="black"))
     ax.text(-18, 4, "ТП", ha="center", va="center", fontweight="bold")
 
-    # координата обрыва
     if n_uch > 0 and 0 <= brk < n_uch:
         if brk == 0:
             x_break = len_uch / 2
@@ -212,7 +207,6 @@ with t4:
     ax.plot(x_break, 0, marker="x", color="red", markersize=14, mew=3)
     ax.text(x_break, 8, "ОБРЫВ", color="red", ha="center", fontweight="bold")
 
-    # ВСЕ дома без света (по просьбе)
     for i, x_pos in enumerate(x_coord):
         col = "#cccccc"
         text_status = "нет"
