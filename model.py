@@ -18,7 +18,12 @@ s = st.sidebar.selectbox("Сечение (мм2)", [2.5, 4, 6, 10, 16, 25], inde
 pr = st.sidebar.selectbox("Предохранитель (А)", [16, 20, 25, 32, 40, 50], index=3)
 tp_p = st.sidebar.slider("Мощность ТП (кВт)", 20, 200, 60, 10)
 res = st.sidebar.slider("Резерв (кВт)", 0, 30, 7, 1)
-brk = st.sidebar.slider("Номер участка с обрывом", 0, k_dom, min(2, k_dom))
+
+if k_dom < 2:
+    default_brk = k_dom
+else:
+    default_brk = 2
+brk = st.sidebar.slider("Номер участка с обрывом", 0, k_dom, default_brk)
 
 # физика
 U = 400
@@ -29,9 +34,16 @@ R_line = r_m * dl / s
 sum_p = k_dom * p_dom + k_fon * p_fon
 
 n_uch = k_dom
-len_uch = dl / n_uch if n_uch > 0 else dl
-r_1_uch = R_line / n_uch if n_uch > 0 else R_line
-x_coord = [(i + 1) * len_uch for i in range(n_uch)]
+if n_uch > 0:
+    len_uch = dl / n_uch
+    r_1_uch = R_line / n_uch
+else:
+    len_uch = dl
+    r_1_uch = R_line
+
+x_coord = []
+for i in range(n_uch):
+    x_coord.append((i + 1) * len_uch)
 
 
 def count_tok(power_kw):
@@ -44,20 +56,27 @@ def calc_drop(power_kw, r_ohm):
     return math.sqrt(3) * count_tok(power_kw) * r_ohm * cosf
 
 
-seg_loads = [
-    (n_uch - i) * p_dom + p_fon * k_fon * (n_uch - i) / n_uch
-    for i in range(n_uch)
-]
+seg_loads = []
+for i in range(n_uch):
+    load_doma = (n_uch - i) * p_dom
+    load_fonari = p_fon * k_fon * (n_uch - i) / n_uch
+    seg_loads.append(load_doma + load_fonari)
 
-segment_drops = [calc_drop(seg_loads[k], r_1_uch) for k in range(n_uch)]
+segment_drops = []
+for k in range(n_uch):
+    drop = calc_drop(seg_loads[k], r_1_uch)
+    segment_drops.append(drop)
 
 voltages = []
 u_now = U
-for drop_val in segment_drops:
-    u_now -= drop_val
+for k in range(len(segment_drops)):
+    u_now = u_now - segment_drops[k]
     voltages.append(u_now)
 
-tot_drop = sum(segment_drops)
+tot_drop = 0
+for k in range(len(segment_drops)):
+    tot_drop = tot_drop + segment_drops[k]
+
 drop_percent = tot_drop / U * 100
 
 print("Нагрузка:", sum_p, "кВт. Потери:", round(drop_percent, 2), "%")
@@ -68,11 +87,11 @@ c1, c2, c3, c4 = st.columns(4)
 
 with c1:
     if sum_p > tp_p:
-        st.error(f"ТП не тянет: {round(sum_p)} > {tp_p}")
+        st.error(f"Перегрузка ТП: {round(sum_p)} > {tp_p} кВт")
     elif sum_p > tp_p * 0.9:
-        st.warning(f"ТП почти загружена: {round(sum_p)} / {tp_p}")
+        st.warning(f"ТП почти загружена: {round(sum_p)} / {tp_p} кВт")
     else:
-        st.success(f"ТП в порядке: {round(sum_p)} / {tp_p}")
+        st.success(f"ТП в норме: {round(sum_p)} / {tp_p} кВт")
 
 with c2:
     if drop_percent > 5:
@@ -112,7 +131,8 @@ with t1:
     ax.plot([-6, dl + 12], [0, 0], color="black", lw=2.5)
     ax.text(dl + 15, 0, f"Ток: {round(count_tok(sum_p))} А", fontsize=9, va="center")
 
-    for i, x_pos in enumerate(x_coord):
+    for i in range(len(x_coord)):
+        x_pos = x_coord[i]
         ax.plot([x_pos, x_pos], [0, 22], color="black", lw=1.5)
         ax.add_patch(patches.Rectangle((x_pos - 8, 22), 16, 16, facecolor="#a52a2a", edgecolor="black"))
         ax.text(x_pos, 30, str(i + 1), ha="center", va="center", color="white", fontweight="bold")
@@ -129,13 +149,21 @@ with t1:
 
 with t2:
     fig, ax = plt.subplots(figsize=(10, 4))
-    xs = [0] + x_coord
-    ys = [U] + voltages
+    xs = [0]
+    for i in range(len(x_coord)):
+        xs.append(x_coord[i])
+
+    ys = [U]
+    for i in range(len(voltages)):
+        ys.append(voltages[i])
+
     ax.plot(xs, ys, marker="o", color="#1f4e79", lw=2, label="Напряжение")
     ax.axhline(U, color="gray", ls="--", lw=1, label="Номинал 400В")
     ax.axhline(U * 0.95, color="red", ls=":", lw=1.2, label="-5% ПУЭ")
 
-    for px, py in zip(xs, ys):
+    for i in range(len(xs)):
+        px = xs[i]
+        py = ys[i]
         ax.annotate(f"{round(py, 1)}", (px, py), textcoords="offset points", xytext=(0, 8), ha="center", fontsize=8)
 
     ax.set_xlabel("Расстояние от ТП, м")
@@ -149,13 +177,18 @@ with t2:
 
 with t3:
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11, 4))
-    lbls = [f"Уч.{i + 1}" for i in range(n_uch)]
+    lbls = []
+    for i in range(n_uch):
+        lbls.append(f"Уч.{i + 1}")
 
     ax1.bar(lbls, segment_drops, color="#c0504d")
     ax1.set_title("Потери напряжения (В)")
     ax1.grid(axis="y", alpha=0.3)
 
-    toks = [count_tok(x) for x in seg_loads]
+    toks = []
+    for i in range(len(seg_loads)):
+        toks.append(count_tok(seg_loads[i]))
+
     ax2.bar(lbls, toks, color="#4f81bd")
     ax2.set_title("Токи на участках (А)")
     ax2.grid(axis="y", alpha=0.3)
@@ -181,13 +214,23 @@ with t4:
         ax.plot(x_break, 0, marker="x", color="red", markersize=14, mew=3)
         ax.text(x_break, 8, "ОБРЫВ", color="red", ha="center", fontweight="bold")
 
-    for i, x_pos in enumerate(x_coord):
-        alive = (brk == 0) or ((i + 1) < brk)
-        col = "#a52a2a" if alive else "#cccccc"
+    for i in range(len(x_coord)):
+        x_pos = x_coord[i]
+        if brk == 0 or (i + 1) < brk:
+            alive = True
+            col = "#a52a2a"
+            status_text = "свет"
+            status_color = "green"
+        else:
+            alive = False
+            col = "#cccccc"
+            status_text = "нет"
+            status_color = "red"
+
         ax.plot([x_pos, x_pos], [0, 22], color="black", lw=1.5)
         ax.add_patch(patches.Rectangle((x_pos - 8, 22), 16, 16, facecolor=col, edgecolor="black"))
         ax.text(x_pos, 30, str(i + 1), ha="center", va="center", color="white", fontweight="bold")
-        ax.text(x_pos, 15, "свет" if alive else "нет", ha="center", fontsize=7, color="green" if alive else "red")
+        ax.text(x_pos, 15, status_text, ha="center", fontsize=7, color=status_color)
 
     ax.text(dl / 2, -40, f"Резерв: {res} кВт", ha="center", color="#1f4e79")
     st.pyplot(fig)
@@ -197,4 +240,9 @@ st.subheader("Итоговые значения")
 st.write(f"Суммарная нагрузка: {round(sum_p, 1)} кВт")
 st.write(f"Ток на входе: {round(count_tok(sum_p), 1)} А")
 st.write(f"Суммарные потери: {round(drop_percent, 2)}%")
-st.write(f"Напряжение в конце: {round(voltages[-1] if voltages else U, 1)} В")
+
+if len(voltages) > 0:
+    u_end = voltages[-1]
+else:
+    u_end = U
+st.write(f"Напряжение в конце: {round(u_end, 1)} В")
