@@ -11,6 +11,8 @@ st.sidebar.header("Настройки")
 k_dom = st.sidebar.slider("Кол-во домов", 1, 10, 5)
 p_dom = st.sidebar.slider("Мощность 1 дома (кВт)", 1, 15, 6, 1)
 k_fon = st.sidebar.slider("Кол-во фонарей", 0, 20, 8)
+
+# ТУТ ИСПРАВЛЕНО: все числа float, шаг 0.05
 p_fon = st.sidebar.slider("Мощность фонаря (кВт)", 0.1, 1.0, 0.25, 0.05)
 
 dl = st.sidebar.slider("Длина (м)", 50, 500, 150, 10)
@@ -87,7 +89,7 @@ with c2:
     if drop_percent > 5:
         st.error(f"Потери {round(drop_percent, 2)}% > 5%")
     elif drop_percent > 3:
-        st.warning(f"Потери {round(drop_percent, 2)}% — норма, но высокие")
+        st.warning(f"Потери {round(drop_percent, 2)}% (норма до 5%)")
     else:
         st.success(f"Потери {round(drop_percent, 2)}% < 5%")
 
@@ -196,6 +198,7 @@ with t4:
     ax.add_patch(patches.Rectangle((-30, -12), 24, 24, facecolor="#8a9a5b", edgecolor="black"))
     ax.text(-18, 4, "ТП", ha="center", va="center", fontweight="bold")
 
+    # координата обрыва
     if n_uch > 0 and 0 <= brk < n_uch:
         if brk == 0:
             x_break = len_uch / 2
@@ -209,16 +212,11 @@ with t4:
     ax.plot(x_break, 0, marker="x", color="red", markersize=14, mew=3)
     ax.text(x_break, 8, "ОБРЫВ", color="red", ha="center", fontweight="bold")
 
+    # ВСЕ дома без света (по просьбе)
     for i, x_pos in enumerate(x_coord):
-        alive = i < brk
-        if alive:
-            col = "#a52a2a"
-            text_status = "свет"
-            text_color = "green"
-        else:
-            col = "#cccccc"
-            text_status = "нет"
-            text_color = "red"
+        col = "#cccccc"
+        text_status = "нет"
+        text_color = "red"
             
         ax.plot([x_pos, x_pos], [0, 22], color="black", lw=1.5)
         ax.add_patch(patches.Rectangle((x_pos - 8, 22), 16, 16, facecolor=col, edgecolor="black"))
