@@ -18,7 +18,7 @@ s = st.sidebar.selectbox("Сечение (мм2)", [2.5, 4, 6, 10, 16, 25], inde
 pr = st.sidebar.selectbox("Предохранитель (А)", [16, 20, 25, 32, 40, 50], index=3)
 tp_p = st.sidebar.slider("Мощность ТП (кВт)", 20, 200, 60, 10)
 res = st.sidebar.slider("Резерв (кВт)", 0, 30, 7, 1)
-brk = st.sidebar.slider("Номер участка с обрывом", 0, k_dom, 1)
+brk = st.sidebar.slider("Номер участка с обрывом", 0, k_dom, min(2, k_dom))
 
 # физика
 U = 400
@@ -90,10 +90,8 @@ with c3:
         st.success(f"Ток дома {round(i_dom, 1)} А < {pr} А")
 
 with c4:
-    if res >= p_dom:
-        st.success("Резерв есть")
-    elif res > 0:
-        st.warning("Резерв маловат")
+    if res > 0:
+        st.success(f"Резерв есть: {res} кВт")
     else:
         st.error("Резерва нет")
 
@@ -174,18 +172,17 @@ with t4:
     ax.add_patch(patches.Rectangle((-30, -12), 24, 24, facecolor="#8a9a5b", edgecolor="black"))
     ax.text(-18, 4, "ТП", ha="center", va="center", fontweight="bold")
 
-    if n_uch > 0 and 0 <= brk < n_uch:
-        x_break = len_uch / 2 if brk == 0 else x_coord[brk - 1] + len_uch / 2
+    if brk == 0 or n_uch == 0:
+        ax.plot([-6, dl + 12], [0, 0], color="black", lw=2.5)
     else:
-        x_break = dl / 2
-
-    ax.plot([-6, x_break], [0, 0], color="black", lw=2.5)
-    ax.plot([x_break, dl + 12], [0, 0], color="gray", lw=2.5, ls="--")
-    ax.plot(x_break, 0, marker="x", color="red", markersize=14, mew=3)
-    ax.text(x_break, 8, "ОБРЫВ", color="red", ha="center", fontweight="bold")
+        x_break = (brk - 0.5) * len_uch
+        ax.plot([-6, x_break], [0, 0], color="black", lw=2.5)
+        ax.plot([x_break, dl + 12], [0, 0], color="gray", lw=2.5, ls="--")
+        ax.plot(x_break, 0, marker="x", color="red", markersize=14, mew=3)
+        ax.text(x_break, 8, "ОБРЫВ", color="red", ha="center", fontweight="bold")
 
     for i, x_pos in enumerate(x_coord):
-        alive = i < brk
+        alive = (brk == 0) or ((i + 1) < brk)
         col = "#a52a2a" if alive else "#cccccc"
         ax.plot([x_pos, x_pos], [0, 22], color="black", lw=1.5)
         ax.add_patch(patches.Rectangle((x_pos - 8, 22), 16, 16, facecolor=col, edgecolor="black"))
