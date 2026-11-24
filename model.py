@@ -215,11 +215,18 @@ with t4:
     ax.plot(x_break, 0, marker="x", color="red", markersize=14, mew=3)
     ax.text(x_break, 8, "ОБРЫВ", color="red", ha="center", fontweight="bold")
 
-    # дома при обрыве (все без света)
+    # дома при обрыве
     for i, x_pos in enumerate(x_coord):
-        col = "#cccccc"
-        text_status = "нет"
-        text_color = "red"
+        alive = i < brk - 1
+        
+        if alive:
+            col = "#a52a2a"
+            text_status = "свет"
+            text_color = "green"
+        else:
+            col = "#cccccc"
+            text_status = "нет"
+            text_color = "red"
             
         ax.plot([x_pos, x_pos], [0, 22], color="black", lw=1.5)
         ax.add_patch(patches.Rectangle((x_pos - 8, 22), 16, 16, facecolor=col, edgecolor="black"))
