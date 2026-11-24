@@ -77,30 +77,30 @@ c1, c2, c3, c4 = st.columns(4)
 
 with c1:
     if sum_p > tp_p:
-        st.error(f"ТП не тянет: {round(sum_p)} > {tp_p}")
+        st.error(f"ТП перегружена: {round(sum_p)} > {tp_p} кВт")
     elif sum_p > tp_p * 0.9:
-        st.warning(f"ТП почти загружена: {round(sum_p)} / {tp_p}")
+        st.warning(f"ТП почти на пределе: {round(sum_p)} / {tp_p} кВт")
     else:
-        st.success(f"ТП в порядке: {round(sum_p)} / {tp_p}")
+        st.success(f"ТП справляется: {round(sum_p)} / {tp_p} кВт")
 
 with c2:
     if drop_percent > 5:
-        st.error(f"Потери {round(drop_percent, 2)}% — больше 5%")
+        st.error(f"Потери {round(drop_percent, 2)}% — выше нормы (5%)")
     elif drop_percent > 3:
         st.warning(f"Потери {round(drop_percent, 2)}% — многовато")
     else:
-        st.success(f"Потери {round(drop_percent, 2)}% — всё ок")
+        st.success(f"Потери {round(drop_percent, 2)}% — нормально")
 
 with c3:
     i_dom = count_tok(p_dom)
     if i_dom > pr * 1.1:
-        st.error(f"Ток дома {round(i_dom, 1)} А > {pr} А")
+        st.error(f"Ток дома {round(i_dom, 1)} А — выбьет предохранитель {pr} А")
     else:
-        st.success(f"Ток дома {round(i_dom, 1)} А < {pr} А")
+        st.success(f"Ток дома {round(i_dom, 1)} А — предохранитель {pr} А подходит")
 
 with c4:
     if res >= p_dom:
-        st.success("Резерв есть")
+        st.success("Резерва хватает")
     elif res > 0:
         st.warning("Резерв маловат")
     else:
