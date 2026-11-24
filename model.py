@@ -18,7 +18,7 @@ s = st.sidebar.selectbox("Сечение (мм2)", [2.5, 4, 6, 10, 16, 25], inde
 pr = st.sidebar.selectbox("Предохранитель (А)", [16, 20, 25, 32, 40, 50], index=3)
 tp_p = st.sidebar.slider("Мощность ТП (кВт)", 20, 200, 60, 10)
 res = st.sidebar.slider("Резерв (кВт)", 0, 30, 7, 1)
-brk = st.sidebar.slider("Номер участка с обрывом", 0, k_dom, 2)
+brk = st.sidebar.slider("Номер участка с обрывом", 0, k_dom, 1)
 
 # физика
 U = 400
