@@ -217,7 +217,8 @@ with t4:
 
     # дома при обрыве
     for i, x_pos in enumerate(x_coord):
-        alive = i < brk - 1
+        # дом горит, если его индекс МЕНЬШЕ номера обрыва
+        alive = i < brk
         
         if alive:
             col = "#a52a2a"
